@@ -1,14 +1,14 @@
-#ConfigMap
--> API Object to store non-confidential data   
--> Stores in key-value pairs 
--> it can store data as files 
+# ConfigMap 
+-> API Object to store non-confidential data    
+-> Stores in key-value pairs   
+-> it can store data as files   
 -> Can be used as   
      1. Env variables   
      2. Cmd line args  
      3. files in volume   
      4. Use K8s API to read  
 
-#Commands 
+# Commands 
 ```shell
 kubectl get cm 
 kubectl get cm {name} -o yaml
@@ -21,7 +21,7 @@ kubectl create configmap {cm-name} --from-file {yaml file}
 ----------------------------------------------
 kubectl create configmap prakash-cm --from-file cm.yaml
 ```
-##ConfigMap
+## ConfigMap
 ```yaml
 apiVersion: v1
 kind: ConfigMap
@@ -39,11 +39,11 @@ data:
      kafkabrokers=localhost:9092
      num.stream.threads=10
 ```
-##CM as Env variables 
--> add in container section 
--> create key and get the values in CM (env:)
--> Attach full CM as env var (envFrom)
--> Attach file(CM) as Volume 
+## CM as Env variables 
+-> add in container section  
+-> create key and get the values in CM (env:)  
+-> Attach full CM as env var (envFrom)  
+-> Attach file(CM) as Volume  
 ```yaml
     spec:
       containers:
@@ -160,8 +160,8 @@ kafkabrokers=localhost:9092
 num.stream.threads=10
 ```
 
-##Passing Cm as CMD args 
--> using apline as base image 
+## Passing Cm as CMD args 
+-> using apline as base image  
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
