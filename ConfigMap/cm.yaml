@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runit-env-cm1
+data:
+  # property-like keys; each key maps to a simple value
+  kafkabrokers: "localhost:9093"
+  maxrecords: "5"

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: linux
+  labels:
+    app: linuz
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: linux
+  template:
+    metadata:
+      labels:
+        app: linux
+    spec:
+      containers:
+        - name: alpine
+          image: alpine
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 81
+          command: [ "/bin/echo", "$(welcome_message) $(KAFKA_BROKER_URL)" ]
+          env:
+           - name: welcome_message
+             value: "Welcome to cm"
+           - name: KAFKA_BROKER_URL
+             valueFrom:
+               configMapKeyRef:
+                 name: runit-env-cm
+                 key: kafkabrokers

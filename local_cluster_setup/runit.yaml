@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runit
+  labels:
+    app: runit
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: runit
+  template:
+    metadata:
+      labels:
+        app: runit
+    spec:
+      containers:
+        - name: runit
+          image: runit
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
