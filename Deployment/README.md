@@ -62,7 +62,9 @@ kubectl edit deployment
 -> lets say we have app v1 with 4 replicas 
 -> when we update k8s willnot kill all 4 at same time and get v2 app
 -> to maintain availability (75% and 25%) it kills one pod and gets new pod with v2
--> First create new pod with v2 if its healthy then delete one in old 
+-> First create new pod with v2 if its healthy then delete one in old (terminationGracePeriod=30 sec def)
+-> container willbe in terminating state but it will terminate after 30 sec 
+-> LB will not send trafic to terminating gracefull is to finish existing req
 -> max available pods (125%) due to create and delete
 
 
@@ -192,3 +194,26 @@ Image pull errors
 Insufficient permissions
 Limit ranges
 Application runtime misconfigurati
+
+# Watch
+-> watch any k8s object 
+```shell
+kubectl get pod --watch
+kubectl get rs --watch
+```
+```shell
+[root@localhost Deployment]# kubectl get pod --watch
+NAME                     READY   STATUS    RESTARTS   AGE
+runit-7d674dfb7d-f7mvm   1/1     Running   0          7m2s
+runit-7d674dfb7d-sr7j6   1/1     Running   0          7m2s
+runit-7d674dfb7d-wp2v9   1/1     Running   0          7m2s
+runit-7d674dfb7d-f7mvm   1/1     Terminating   0          7m17s
+runit-7d674dfb7d-q2brp   0/1     Pending       0          0s
+runit-7d674dfb7d-q2brp   0/1     Pending       0          0s
+runit-7d674dfb7d-q2brp   0/1     ContainerCreating   0          0s
+runit-7d674dfb7d-q2brp   1/1     Running             0          1s
+runit-7d674dfb7d-f7mvm   0/1     Terminating         0          7m49s
+runit-7d674dfb7d-f7mvm   0/1     Terminating         0          8m
+runit-7d674dfb7d-f7mvm   0/1     Terminating         0          8m
+
+```
