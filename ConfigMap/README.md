@@ -61,7 +61,7 @@ data:
 
 ```
 
-##Sample CM 
+## Sample CM 
 ```yaml
 apiVersion: v1
 kind: ConfigMap
