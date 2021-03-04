@@ -1,0 +1,84 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runit-env-cm
+data:
+  # property-like keys; each key maps to a simple value
+  kafkabrokers: "localhost:9092"
+  threads: "5"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runit-env-cm1
+data:
+  # property-like keys; each key maps to a simple value
+  kafkabrokers: "localhost:9093"
+  maxrecords: "5"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: runit-env-file
+data:
+  server.properties: |
+    kafkabrokers=localhost:9092
+    num.stream.threads=10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prakash-runit-service
+spec:
+  selector:
+    app: prakash-runit
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 9092
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: runit
+  labels:
+    app: runit
+spec:
+  replicas: 3
+#  strategy:
+#    type: Recreate
+  selector:
+    matchLabels:
+      app: prakash-runit
+  template:
+    metadata:
+      labels:
+        app: prakash-runit
+    spec:
+      containers:
+        - name: runit
+          image: runit
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          env:
+            - name: KAFKA_BROKER_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: runit-env-cm
+                  key: kafkabrokers
+            - name: Stream_threads
+              valueFrom:
+                configMapKeyRef:
+                  name: runit-env-cm
+                  key: threads
+          envFrom:
+            - configMapRef:
+                name: runit-env-cm1
+          volumeMounts:
+            - name: server-properties-from-cm
+              mountPath: /etc/config
+      volumes:
+        - name: server-properties-from-cm
+          configMap:
+            name: runit-env-file
