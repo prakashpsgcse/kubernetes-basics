@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: runit
+spec:
+  selector:
+    matchLabels:
+      app: runit # has to match .spec.template.metadata.labels
+  serviceName: "runit"
+  replicas: 3 # by default is 1
+  template:
+    metadata:
+      labels:
+        app: runit # has to match .spec.selector.matchLabels
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: runit
+          image: cust
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: k8s-prakash
+              mountPath: /prakash
+  volumeClaimTemplates:
+    - metadata:
+        name: k8s-prakash
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi

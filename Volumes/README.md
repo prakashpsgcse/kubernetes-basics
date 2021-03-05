@@ -82,7 +82,7 @@ volumeMounts:
 -> Contents of an nfs volume are preserved and the volume is merely unmounted  
 -> NFS volume can be pre-populated with data, and that data can be shared between pods  
 
-# PersistentVolumeClaim
+## PersistentVolumeClaim
 -> This also volume 
 -> used to mount a PersistentVolume into a Pod  
 -> helps to claim durable storage without knowing the details of the particular cloud environment  
@@ -115,9 +115,29 @@ volumeMounts:
 -> create a secret and mount it using projected volume
 
 # Persistent Volume (PV)
--> Storage provisioned by admin  
+-> Storage provisioned by admin  or dynamically by storage class  
 -> backed by a persistent disk (EBS,GCE,NFS)
 -> PersistentVolume lifecycle is managed by Kubernetes ????  
 -> can be dynamically provisioned  (by PersistentVolumeClaims)
 -> exist independently of Pods (Disk & data Exists after pod deleted)
 -> provisioned dynamically through PersistentVolumeClaims, or  created by a cluster admin
+-> PV provisioned by static(admin) & dynamic (using PVC and storage class)
+# PersistentVolumeClaims
+-> It is a Request 
+-> created by user not admin
+-> we can say its a link to actual PV 
+-> But pod access storage by using clain as VOLUME
+-> Request claim to a PersistentVolume resource
+-> The user does not need to know the underlying provisioning
+-> claims must be created in the same namespace as pod
+-> PVC request contains request a specific size, access mode, and StorageClass for PV
+-> if PV exists (satisfies request) then claim(PVC) is bound to it 
+-> PVC also type of volume so when POD contains PVC then K8S will check PV attached to that PVC and mounts it to pod  
+-> cannot bind 2 PVC to PV
+-> PVC without storage class will not trigger dynamic provisioning  ,it will use exisiting PV 
+-> When using with PVC nd storage first it will check PV created by admin if it is not available then creates based on storage class
+->
+
+
+# Storage class 
+-> 
