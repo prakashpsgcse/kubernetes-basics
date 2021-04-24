@@ -4,7 +4,7 @@
 #Master (Control Plane)
 -> manages cluster state/nodes/objects 
 -> major components: kube-apiserver, kube-controller-manager and kube-scheduler
--> all those components can run in single mastr node 
+-> all those components can run in single master node 
 -> It can be replicated using multiple master node 
 #### API server 
    -> interface for intracting with UI 
