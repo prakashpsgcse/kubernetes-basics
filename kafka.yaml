@@ -1,0 +1,72 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kafka-cm
+data:
+  ZOOKEEPER: "zk-svc.default.svc.cluster.local:2181"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-svc
+  labels:
+    app: kafka
+spec:
+  ports:
+    - port: 9092
+      name: plaintext
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-service
+  labels:
+    app: kafka
+spec:
+  ports:
+    - port: 9092
+      name: plaintext
+  selector:
+    app: kafka
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  serviceName: "kafka-svc"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: kafka
+          image: docker.io/prakashpsgcse/kafka:2.7
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 9092
+              name: plaintext
+          envFrom:
+            - configMapRef:
+                name: kafka-cm
+          volumeMounts:
+            - name: kafka-pvc
+              mountPath: /mnt/kafka
+  volumeClaimTemplates:
+    - metadata:
+        name: kafka-pvc
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi

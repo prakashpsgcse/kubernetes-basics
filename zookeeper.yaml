@@ -1,0 +1,79 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zk-cm
+data:
+  CLUSTER_SIZE: "3"
+  ZOOKEEPER_SERVERS: "1:zk-0.zk-svc.default.svc.cluster.local:2888:3888,2:zk-1.zk-svc.default.svc.cluster.local:2888:3888,3:zk-2.zk-svc.default.svc.cluster.local:2888:3888"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zk-svc
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2888
+      name: server-port
+    - port: 3888
+      name: election-port
+  clusterIP: None
+  selector:
+    app: zk
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: zookeeper-service
+  labels:
+    app: zk
+spec:
+  ports:
+    - port: 2181
+      name: client
+  selector:
+    app: zk
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: zk
+spec:
+  selector:
+    matchLabels:
+      app: zk
+  serviceName: "zk-svc"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: zk
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: zk
+          image: docker.io/prakashpsgcse/zookeeper:3.4.7
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 2181
+              name: client
+            - containerPort: 2888
+              name: server
+            - containerPort: 3888
+              name: election
+          envFrom:
+            - configMapRef:
+                name: zk-cm
+          volumeMounts:
+            - name: k8s-prakash
+              mountPath: /mnt/zookeeper
+  volumeClaimTemplates:
+    - metadata:
+        name: k8s-prakash
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "standard"
+        resources:
+          requests:
+            storage: 1Gi

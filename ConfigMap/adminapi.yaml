@@ -16,6 +16,18 @@ data:
     kafkabrokers=localhost:9092
     num.stream.threads=10
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-api-svc
+spec:
+  selector:
+    app: adminapi
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,7 +62,11 @@ spec:
           volumeMounts:
             - name: server-properties-from-cm
               mountPath: /etc/config
+            - name: api-history
+              mountPath: /opt/adminapi/data
       volumes:
         - name: server-properties-from-cm
           configMap:
             name: adminclient-props
+        - name: api-history
+          emptyDir: {}
